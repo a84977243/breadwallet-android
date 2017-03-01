@@ -235,7 +235,7 @@ public class PasswordDialogFragment extends DialogFragment {
             forceDialogStayOn = true;
         }
         if (verifyOnly) {
-            title.setText(String.format(getResources().getString(R.string.enter_passcode), "\"" + BRConstants.bitcoinLowercase + "read\""));
+            title.setText(String.format(getResources().getString(R.string.enter_passcode), BRConstants.bitcoinLowercase));
         }
 
         textWatcher = new TextWatcher() {

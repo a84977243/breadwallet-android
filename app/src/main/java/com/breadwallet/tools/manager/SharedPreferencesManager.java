@@ -173,7 +173,7 @@ public class SharedPreferencesManager {
 
     public static long getLimit(Activity activity) {
         SharedPreferences prefs = activity.getSharedPreferences(BRConstants.PREFS_NAME, Context.MODE_PRIVATE);
-        return prefs.getInt(BRConstants.LIMIT_PREFS, BRConstants.HUNDRED_BITS);
+        return prefs.getLong(BRConstants.LIMIT_PREFS, BRConstants.HUNDRED_BITS);
     }
 
     public static void putLimit(Activity activity, long limit) {

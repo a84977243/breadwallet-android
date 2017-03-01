@@ -10,6 +10,8 @@ import com.breadwallet.tools.manager.SharedPreferencesManager;
 import com.breadwallet.wallet.BRWalletManager;
 import com.google.firebase.crash.FirebaseCrash;
 
+import junit.framework.Assert;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,6 +25,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import static com.breadwallet.tools.util.BRConstants.DEFAULT_FEE_PER_KB;
+import static android.R.attr.data;
 
 /**
  * BreadWallet
@@ -173,7 +176,7 @@ public class JsonParser {
             } else {
                 @SuppressWarnings("deprecation") long date = Date.parse(strDate) / 1000;
                 SharedPreferencesManager.putSecureTime(app, date);
-                Log.e(TAG, "Secure time set to: " + date);
+                Assert.assertTrue(date != 0);
             }
 
             if (urlConn.getInputStream() != null) {

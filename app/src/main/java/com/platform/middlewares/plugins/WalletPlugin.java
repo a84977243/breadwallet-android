@@ -1,14 +1,19 @@
 package com.platform.middlewares.plugins;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 
 import com.breadwallet.presenter.activities.MainActivity;
+import com.breadwallet.tools.security.RequestHandler;
 import com.breadwallet.tools.util.BRStringFormatter;
 import com.breadwallet.tools.util.Utils;
 import com.breadwallet.wallet.BRWalletManager;
 import com.platform.interfaces.Plugin;
 
 import org.apache.commons.compress.utils.IOUtils;
+import org.eclipse.jetty.continuation.Continuation;
+import org.eclipse.jetty.continuation.ContinuationSupport;
 import org.eclipse.jetty.server.Request;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,15 +55,19 @@ import static org.eclipse.jetty.http.HttpMethod.POST;
  */
 public class WalletPlugin implements Plugin {
     public static final String TAG = WalletPlugin.class.getName();
+    private static Continuation continuation;
+    private static Request globalBaseRequest;
 
     @Override
     public boolean handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
         if (!target.startsWith("/_wallet")) return false;
 
         if (target.startsWith("/_wallet/info") && request.getMethod().equalsIgnoreCase("get")) {
+            Log.i(TAG, "handling: " + target + " " + baseRequest.getMethod());
             final MainActivity app = MainActivity.app;
             if (app == null) {
                 try {
+                    Log.e(TAG, "handle: context is null: " + target + " " + baseRequest.getMethod());
                     response.sendError(500, "context is null");
                     baseRequest.setHandled(true);
                 } catch (IOException e) {
@@ -74,30 +83,33 @@ public class WalletPlugin implements Plugin {
                 jsonResp.put("receive_address", BRWalletManager.getReceiveAddress());
                 response.setStatus(200);
                 response.getWriter().write(jsonResp.toString());
-                baseRequest.setHandled(true);
             } catch (JSONException e) {
                 e.printStackTrace();
                 try {
+                    Log.e(TAG, "handle: json error: " + target + " " + baseRequest.getMethod());
                     response.sendError(500, "json error");
-                    baseRequest.setHandled(true);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
                 try {
+                    Log.e(TAG, "handle: io exception: " + target + " " + baseRequest.getMethod());
                     response.sendError(500, "IO exception: " + e.getMessage());
-                    baseRequest.setHandled(true);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
+            } finally {
+                baseRequest.setHandled(true);
             }
 
             return true;
         } else if (target.startsWith("/_wallet/format") && request.getMethod().equalsIgnoreCase("get")) {
+            Log.i(TAG, "handling: " + target + " " + baseRequest.getMethod());
             String amount = request.getParameter("amount");
             if (Utils.isNullOrEmpty(amount)) {
                 try {
+                    Log.e(TAG, "handle: amount is not specified: " + target + " " + baseRequest.getMethod());
                     response.sendError(400);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -123,6 +135,7 @@ public class WalletPlugin implements Plugin {
             }
             return true;
         } else if (target.startsWith("/_wallet/sign_bitid") && request.getMethod().equalsIgnoreCase("post")) {
+            Log.i(TAG, "handling: " + target + " " + baseRequest.getMethod());
             /**
              * POST /_wallet/sign_bitid
 
@@ -141,9 +154,21 @@ public class WalletPlugin implements Plugin {
              "signature": "oibwaeofbawoefb" // base64-encoded signature
              }
              */
+            final MainActivity app = MainActivity.app;
+            if (app == null) {
+                try {
+                    Log.e(TAG, "handle: context is null: " + target + " " + baseRequest.getMethod());
+                    response.sendError(500, "context is null");
+                    baseRequest.setHandled(true);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return true;
+            }
             String contentType = request.getHeader("content-type");
             if (contentType == null || !contentType.equalsIgnoreCase("application/json")) {
                 try {
+                    Log.e(TAG, "handle: content type is not application/json: " + target + " " + baseRequest.getMethod());
                     response.sendError(400);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -151,14 +176,15 @@ public class WalletPlugin implements Plugin {
                 baseRequest.setHandled(true);
                 return true;
             }
-            String strResp = null;
+            String reqBody = null;
             try {
-                strResp = new String(IOUtils.toByteArray(request.getInputStream()));
+                reqBody = new String(IOUtils.toByteArray(request.getInputStream()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if (Utils.isNullOrEmpty(strResp)) {
+            if (Utils.isNullOrEmpty(reqBody)) {
                 try {
+                    Log.e(TAG, "handle: reqBody is empty: " + target + " " + baseRequest.getMethod());
                     response.sendError(400);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -167,21 +193,55 @@ public class WalletPlugin implements Plugin {
                 return true;
             }
 
-            String stringToSign = null;
-            String bitIdUrl = null;
-            int bitIdIndex = 0;
-
             try {
-                JSONObject obj = new JSONObject(strResp);
-
+                JSONObject obj = new JSONObject(reqBody);
+                continuation = ContinuationSupport.getContinuation(request);
+                continuation.suspend(response);
+                globalBaseRequest = baseRequest;
+                RequestHandler.tryBitIdUri(app, obj.getString("bitid_url"), obj);
             } catch (JSONException e) {
                 e.printStackTrace();
+                Log.e(TAG, "handle: Failed to parse Json request body: " + target + " " + baseRequest.getMethod());
+                return true;
             }
 
             return true;
         }
 
-        Log.e(TAG, "handle: WALLET PLUGIN DID NOT HANDLE: " + target + " (" + request.getMethod() + ")");
+        Log.e(TAG, "handle: WALLET PLUGIN DID NOT HANDLE: " + target + " " + baseRequest.getMethod());
         return true;
+    }
+
+
+    public static void handleBitId(final JSONObject restJson) {
+        if(restJson == null) {
+            Log.e(TAG, "handleBitId: WARNING restJson is null");
+            return;
+        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (continuation == null) {
+                    Log.e(TAG, "handleBitId: WARNING continuation is null");
+                    return;
+                }
+
+                try {
+                    try {
+                        continuation.getServletResponse().getWriter().write(restJson.toString());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    ((HttpServletResponse) continuation.getServletResponse()).setStatus(200);
+                } finally {
+                    globalBaseRequest.setHandled(true);
+                    continuation.complete();
+                    continuation = null;
+                    globalBaseRequest = null;
+                }
+            }
+        }).start();
+
+
     }
 }
