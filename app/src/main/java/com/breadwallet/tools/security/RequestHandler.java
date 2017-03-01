@@ -165,6 +165,7 @@ public class RequestHandler {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                if(_bitUri == null) return;
                 Uri tmpUri = Uri.parse(_bitUri);
                 try {
                     phrase = KeyStoreManager.getKeyStorePhrase(app, REQUEST_PHRASE_BITID);
@@ -320,10 +321,10 @@ public class RequestHandler {
         String tmp = str.trim().replaceAll("\n", "").replaceAll(" ", "%20");
         URI uri = URI.create(tmp);
 
-        if (uri.getScheme() == null || !uri.getScheme().equals("bitcoin")) {
-            tmp = "bitcoin://".concat(tmp);
+        if (uri.getScheme() == null || !uri.getScheme().equals("dash")) {
+            tmp = "dash://".concat(tmp);
         } else {
-            tmp = tmp.replace("bitcoin:", "bitcoin://");
+            tmp = tmp.replace("dash:", "dash://");
         }
         uri = URI.create(tmp);
 //        String[] parts = tmp.split("\\?", 2);

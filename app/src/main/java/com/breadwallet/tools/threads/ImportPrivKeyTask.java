@@ -52,7 +52,9 @@ import java.nio.charset.Charset;
 
 public class ImportPrivKeyTask extends AsyncTask<String, String, String> {
     public static final String TAG = ImportPrivKeyTask.class.getName();
-    public static final String UNSPENT_URL = "https://api.breadwallet.com/q/addr/";
+    //public static final String UNSPENT_URL = "https://insight.dash.siampm.com/q/addr/";
+    public static final String UNSPENT_URL2 = "https://chainz.cryptoid.info/grs/api.dws?q=unspent&key=d47da926b82e&active=";
+    public static final String UNSPENT_URL = "https://insight.dash.siampm.com/api/addr/";
     private Activity app;
     private String key;
     private ImportPrivKeyEntity importPrivKeyEntity;
@@ -69,6 +71,10 @@ public class ImportPrivKeyTask extends AsyncTask<String, String, String> {
         String tmpAddrs = BRWalletManager.getInstance(app).getAddressFromPrivKey(key);
         String url = UNSPENT_URL + tmpAddrs + "/utxo";
         importPrivKeyEntity = createTx(app, url);
+        if(importPrivKeyEntity == null) {
+            String url2 = UNSPENT_URL2 + tmpAddrs;
+            importPrivKeyEntity = createTx_chainz(app, url2);
+        }
         if (importPrivKeyEntity == null) {
             app.runOnUiThread(new Runnable() {
                 @Override
@@ -129,6 +135,38 @@ public class ImportPrivKeyTask extends AsyncTask<String, String, String> {
                 int vout = obj.getInt("vout");
                 String scriptPubKey = obj.getString("scriptPubKey");
                 long amount = obj.getLong("amount");
+                byte[] txidBytes = hexStringToByteArray(txid);
+                byte[] scriptPubKeyBytes = hexStringToByteArray(scriptPubKey);
+                BRWalletManager.getInstance(activity).addInputToPrivKeyTx(txidBytes, vout, scriptPubKeyBytes, amount);
+            }
+
+            result = BRWalletManager.getInstance(activity).getPrivKeyObject();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    public static ImportPrivKeyEntity createTx_chainz(Activity activity, String url) {
+        if (url == null || url.isEmpty()) return null;
+        String jsonString = callURL(url);
+        if (jsonString == null || jsonString.isEmpty()) return null;
+        ImportPrivKeyEntity result = null;
+        JSONArray jsonArray = null;
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(jsonString);
+            jsonArray = jsonObject.getJSONArray("unspent_outputs");//new JSONArray(jsonString);
+            int length = jsonArray.length();
+            if (length > 0)
+                BRWalletManager.getInstance(activity).createInputArray();
+
+            for (int i = 0; i < length; i++) {
+                JSONObject obj = jsonArray.getJSONObject(i);
+                String txid = obj.getString("tx_hash");
+                int vout = obj.getInt("tx_ouput_n");
+                String scriptPubKey = obj.getString("script");
+                long amount = obj.getLong("value");
                 byte[] txidBytes = hexStringToByteArray(txid);
                 byte[] scriptPubKeyBytes = hexStringToByteArray(scriptPubKey);
                 BRWalletManager.getInstance(activity).addInputToPrivKeyTx(txidBytes, vout, scriptPubKeyBytes, amount);

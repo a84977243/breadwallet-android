@@ -171,15 +171,15 @@ public class SharedPreferencesManager {
         editor.apply();
     }
 
-    public static int getLimit(Activity activity) {
+    public static long getLimit(Activity activity) {
         SharedPreferences prefs = activity.getSharedPreferences(BRConstants.PREFS_NAME, Context.MODE_PRIVATE);
         return prefs.getInt(BRConstants.LIMIT_PREFS, BRConstants.HUNDRED_BITS);
     }
 
-    public static void putLimit(Activity activity, int limit) {
+    public static void putLimit(Activity activity, long limit) {
         SharedPreferences prefs = activity.getSharedPreferences(BRConstants.PREFS_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putInt(BRConstants.LIMIT_PREFS, limit);
+        editor.putLong(BRConstants.LIMIT_PREFS, limit);
         editor.apply();
     }
 
@@ -338,7 +338,7 @@ public class SharedPreferencesManager {
 
     public static int getCurrencyUnit(Activity context) {
         SharedPreferences settingsToGet = context.getSharedPreferences(BRConstants.PREFS_NAME, 0);
-        return settingsToGet.getInt(BRConstants.CURRENT_UNIT, BRConstants.CURRENT_UNIT_BITS);
+        return settingsToGet.getInt(BRConstants.CURRENT_UNIT, BRConstants.CURRENT_UNIT_BITCOINS);
     }
 
     public static void putCurrencyUnit(Activity context, int unit) {

@@ -80,12 +80,12 @@ public class FragmentSpendLimit extends Fragment {
         double rate = SharedPreferencesManager.getRate(getActivity());
 
         String alwaysPasscodeString = "always require passcode";
-        String limit100kString = String.format("%s    (%s)", BRStringFormatter.getFormattedCurrencyString("BTC", BRConstants.limit1),
-                BRStringFormatter.getExchangeForAmount(rate, iso, new BigDecimal(String.valueOf(BRConstants.limit1)), getActivity()));
-        String limit1BString = String.format("%s   (%s)", BRStringFormatter.getFormattedCurrencyString("BTC", BRConstants.limit2),
-                BRStringFormatter.getExchangeForAmount(rate, iso, new BigDecimal(String.valueOf(BRConstants.limit2)), getActivity()));
-        String limit10BString = String.format("%s  (%s)", BRStringFormatter.getFormattedCurrencyString("BTC", BRConstants.limit3),
-                BRStringFormatter.getExchangeForAmount(rate, iso, new BigDecimal(String.valueOf(BRConstants.limit3)),getActivity()));
+        String limit100kString = String.format("%s    (%s)", BRStringFormatter.getFormattedCurrencyString("BTC", BRConstants.limit1*BRConstants.factor),
+                BRStringFormatter.getExchangeForAmount(rate, iso, new BigDecimal(String.valueOf(BRConstants.limit1*BRConstants.factor)), getActivity()));
+        String limit1BString = String.format("%s   (%s)", BRStringFormatter.getFormattedCurrencyString("BTC", BRConstants.limit2*BRConstants.factor),
+                BRStringFormatter.getExchangeForAmount(rate, iso, new BigDecimal(String.valueOf(BRConstants.limit2*BRConstants.factor)), getActivity()));
+        String limit10BString = String.format("%s  (%s)", BRStringFormatter.getFormattedCurrencyString("BTC", BRConstants.limit3*BRConstants.factor),
+                BRStringFormatter.getExchangeForAmount(rate, iso, new BigDecimal(String.valueOf(BRConstants.limit3*BRConstants.factor)),getActivity()));
 
         alwaysPasscodeText.setText(alwaysPasscodeString);
         limit100kText.setText(limit100kString);
@@ -134,21 +134,21 @@ public class FragmentSpendLimit extends Fragment {
                 break;
             case 2:
                 checkMark2.setVisibility(View.VISIBLE);
-                PassCodeManager.getInstance().setLimit(getActivity(), BRConstants.limit1);
+                PassCodeManager.getInstance().setLimit(getActivity(), BRConstants.limit1*(long)BRConstants.factor);
                 break;
             case 3:
                 checkMark3.setVisibility(View.VISIBLE);
-                PassCodeManager.getInstance().setLimit(getActivity(), BRConstants.limit2);
+                PassCodeManager.getInstance().setLimit(getActivity(), BRConstants.limit2*(long)BRConstants.factor);
                 break;
             case 4:
                 checkMark4.setVisibility(View.VISIBLE);
-                PassCodeManager.getInstance().setLimit(getActivity(), BRConstants.limit3);
+                PassCodeManager.getInstance().setLimit(getActivity(), BRConstants.limit3*(long)BRConstants.factor);
                 break;
         }
     }
 
     private void setInitialCheckMark() {
-        int limit = PassCodeManager.getInstance().getLimit(getActivity());
+        int limit = (int)(PassCodeManager.getInstance().getLimit(getActivity())/BRConstants.factor);
         switch (limit) {
             case 0:
                 checkMark1.setVisibility(View.VISIBLE);

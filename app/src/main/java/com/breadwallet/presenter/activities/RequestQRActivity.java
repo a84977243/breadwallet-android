@@ -66,7 +66,7 @@ public class RequestQRActivity extends Activity {
         String requestAddrs = getIntent().getExtras().getString(BRConstants.INTENT_EXTRA_REQUEST_ADDRESS);
         String requestAmount = getIntent().getExtras().getString(BRConstants.INTENT_EXTRA_REQUEST_AMOUNT);
 
-        String finalAddress = "bitcoin:" + requestAddrs + "?amount=" + requestAmount;
+        String finalAddress = "dash:" + requestAddrs + "?amount=" + requestAmount;
         qrcode = (ImageView) findViewById(R.id.request_image_qr_code);
         close = (Button) findViewById(R.id.request_close);
         TextView requestAmountText = (TextView) findViewById(R.id.request_amount_text);

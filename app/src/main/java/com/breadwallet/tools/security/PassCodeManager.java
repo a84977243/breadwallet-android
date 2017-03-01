@@ -55,11 +55,11 @@ public class PassCodeManager {
         setSpendingLimitIfNotSet(context);
     }
 
-    public int getLimit(Activity activity) {
+    public long getLimit(Activity activity) {
         return SharedPreferencesManager.getLimit(activity);
     }
 
-    public void setLimit(Activity activity, int limit) {
+    public void setLimit(Activity activity, long limit) {
         SharedPreferencesManager.putLimit(activity, limit);
     }
 

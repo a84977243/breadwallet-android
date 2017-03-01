@@ -22,6 +22,8 @@ import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.Locale;
 
+import static com.breadwallet.tools.util.BRConstants.DEFAULT_FEE_PER_KB;
+
 /**
  * BreadWallet
  * <p/>
@@ -83,26 +85,55 @@ public class JsonParser {
         return jsonArray;
     }
 
+    public static double getDashValue(Activity activity) {
+        String jsonString = callURL("https://poloniex.com/public?command=returnTradeHistory&currencyPair=BTC_DASH");
+        JSONArray jsonArray = null;
+        try {
+            //JSONObject obj = new JSONObject(jsonString);
+            //jsonArray = obj.getJSONArray("body");
+
+            JSONArray recenttrades = new JSONArray(jsonString);
+
+            double btcTraded = 0.0;
+            double coinTraded = 0.0;
+
+            for (int i = 0; i < recenttrades.length(); ++i) {
+                JSONObject trade = (JSONObject) recenttrades.get(i);
+
+                btcTraded += trade.getDouble("total");
+                coinTraded += trade.getDouble("amount");
+
+            }
+
+            return btcTraded / coinTraded;
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     public static void updateFeePerKb(Activity activity) {
-        String jsonString = callURL("https://api.breadwallet.com/fee-per-kb");
+        String jsonString = null; //callURL("https://api.breadwallet.com/fee-per-kb");
         if (jsonString == null || jsonString.isEmpty()) {
             Log.e(TAG, "updateFeePerKb: failed to update fee, response string: " + jsonString);
             return;
         }
         long fee;
-        try {
-            JSONObject obj = new JSONObject(jsonString);
-            fee = obj.getLong("fee_per_kb");
-            if (fee != 0 && fee < BRConstants.MAX_FEE_PER_KB) {
+        //try {
+        //JSONObject obj = new JSONObject(jsonString);
+        //fee = obj.getLong("fee_per_kb");
+        fee = DEFAULT_FEE_PER_KB;
+        if (fee != 0 && fee < BRConstants.MAX_FEE_PER_KB) {
 
-                SharedPreferencesManager.putFeePerKb(activity, fee);
-                BRWalletManager.getInstance(activity).setFeePerKb(fee);
-                Log.e(TAG, "fee set to: " + fee);
-            }
-        } catch (JSONException e) {
+            SharedPreferencesManager.putFeePerKb(activity, fee);
+            BRWalletManager.getInstance(activity).setFeePerKb(fee);
+            Log.e(TAG, "fee set to: " + fee);
+        }
+        /*} catch (JSONException e) {
             FirebaseCrash.report(e);
             e.printStackTrace();
-        }
+        }*/
     }
 
     private static String callURL(String myURL) {

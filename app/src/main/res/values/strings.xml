@@ -1,10 +1,10 @@
 <resources>
     <!-- no need -->
-    <string name="app_name">&#384;readwallet</string>
+    <string name="app_name">dashwallet</string>
     <!-- no need -->
     <string name="lang">en</string>
     <!-- android -->
-    <string name="bitcoin_address">Bitcoin Address</string>
+    <string name="bitcoin_address">Dash Address</string>
     <!-- android -->
     <string name="fingerprint_description">confirm fingerprint</string>
     <!-- android -->
@@ -109,7 +109,7 @@
     <!-- checked -->
     <string name="toast_address_copied">copied</string>
     <!-- checked -->
-    <string name="middle_view_tip_first">This is your bitcoin balance. Bitcoin is a currency. The exchange rate changes with the market.</string>
+    <string name="middle_view_tip_first">This is your bitcoin balance. Dash is a currency. The exchange rate changes with the market.</string>
     <!-- checked -->
     <string name="middle_view_tip_second">%1$s is for \'bits\'. %2$s = 1 bitcoin.</string>
     <!-- checked -->
@@ -250,7 +250,7 @@
     <string name="transaction_history">transaction history</string>
     <!-- checked -->
     <string name="import_private_key">import private key</string>
-    <string name="buy_bitcoin">Buy Bitcoin</string>
+    <string name="buy_bitcoin">Buy Dash</string>
     <!-- checked -->
     <string name="rescan_blockchain">rescan blockchain</string>
     <!-- checked -->
@@ -318,7 +318,7 @@
     <!-- checked -->
     <string name="scan_qr_tip">Scan someone else\'s QR code to get their bitcoin address. You can send a payment to anyone with an address.</string>
     <!-- checked -->
-    <string name="pay_address_tip">Bitcoin addresses can also be copied to the clipboard. A bitcoin address always starts with \'1\' or \'3\'.</string>
+    <string name="pay_address_tip">Dash addresses can also be copied to the clipboard. A bitcoin address always starts with \'1\' or \'3\'.</string>
     <!-- checked -->
     <string name="not_a_recovery_phrase_word">\"%s\" is not a recovery phrase word</string>
     <!-- checked -->

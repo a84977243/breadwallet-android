@@ -177,7 +177,7 @@ public class MainActivity extends FragmentActivity implements Observer {
         Uri data = intent.getData();
         if (data == null) return;
         String scheme = data.getScheme();
-        if (scheme != null && (scheme.startsWith("bitcoin") || scheme.startsWith("bitid"))) {
+        if (scheme != null && (scheme.startsWith("dash") || scheme.startsWith("bitid"))) {
             String str = intent.getDataString();
             RequestHandler.processRequest(this, str);
         } else {

@@ -100,7 +100,7 @@ public class BRConstants {
     /**
      * BRWalletManager
      */
-    public static final long TX_FEE_PER_KB = 5000;
+    public static final long TX_FEE_PER_KB = 10000;
     public static final long DEFAULT_FEE_PER_KB = (TX_FEE_PER_KB * 1000 + 190) / 191;
     public static final long MAX_FEE_PER_KB = (100100 * 1000 + 190) / 191;
 
@@ -133,6 +133,7 @@ public class BRConstants {
     public static final int limit1 = 10000000;
     public static final int limit2 = 100000000;
     public static final int limit3 = 1000000000;
+    public static final long factor = 10;
 
     /**
      * PasswordDialogFragment
@@ -174,12 +175,12 @@ public class BRConstants {
     public static final int CURRENT_UNIT_MBITS = 1;
     public static final int CURRENT_UNIT_BITCOINS = 2;
 
-    public static final String bitcoinLowercase = "\u0180";
-    public static final String bitcoinUppercase = "\u0243";
+    public static final String bitcoinLowercase = "mDASH";//"\u0180";
+    public static final String bitcoinUppercase = "DASH"; //"\u0243";
 
     public static final long PASS_CODE_TIME_LIMIT = TimeUnit.MILLISECONDS.convert(6, TimeUnit.DAYS);
 
-    public static final boolean PLATFORM_ON = true;
+    public static final boolean PLATFORM_ON = false;
 
     private BRConstants() {
     }
