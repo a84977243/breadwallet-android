@@ -18,7 +18,7 @@ model {
             platformVersion = "23"
             moduleName = "core"
             toolchain = "clang"
-            CFlags.addAll(['-std=c99', '-g', '-DBITCOIN_TESTNET=1', '-I' + file('src/main/secp/secp256k1/include'),
+            CFlags.addAll(['-std=c99', '-g', '-DBITCOIN_TESTNET=0', '-I' + file('src/main/secp/secp256k1/include'),
                            '-I' + file('src/main/secp/secp256k1'), '-I' + file('src/main/secp'), '-I' + file('src/main/jni/breadwallet-core'),
                            '-I' + file('src/main/jni/breadwallet-core/x11'),
                            '-I' + file('src/main/jni/transition'), '-Wno-trigraphs', '-Wmissing', '-Wno-missing-prototypes', '-Werror=return-type',
@@ -44,7 +44,7 @@ model {
         }
 
         buildTypes {
-            gitUpdateModules()
+//            gitUpdateModules()
             release {
                 proguardFiles.add(file('proguard-rules.pro'))
                 minifyEnabled = false
